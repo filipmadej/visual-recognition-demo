@@ -39,7 +39,7 @@ var express = require('express'),
   zipUtils = require('./config/zip-utils'),
   uuid      = require('uuid'),
   watson = require('watson-developer-cloud'),
-  require("cfenv");
+  cfenv = require("cfenv");
 
 var appEnv = cfenv.getAppEnv();
 var alchemyCredentials = appEnv.getServiceCreds("alchemy-service");
