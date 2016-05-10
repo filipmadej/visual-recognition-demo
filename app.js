@@ -38,7 +38,12 @@ var express = require('express'),
   datasets = require('./public/data/datasets.json').datasets,
   zipUtils = require('./config/zip-utils'),
   uuid      = require('uuid'),
-  watson = require('watson-developer-cloud');
+  watson = require('watson-developer-cloud'),
+  require("cfenv");
+
+var appEnv = cfenv.getAppEnv();
+var alchemyCredentials = appEnv.getServiceCreds("alchemy-service");
+var visualCredentials = appEnv.getServiceCreds("visual-recognition-service");
 
 
 var ONE_HOUR = 3600000;
@@ -49,13 +54,13 @@ require('./config/express')(app);
 // Create the service wrapper
 var visualRecognition = watson.visual_recognition({
   version: 'v2-beta',
-  username: '<username>',
-  password: '<password>',
+  username: visualCredentials.username,
+  password: visualCredentials.password,
   version_date:'2015-12-02'
 });
 
 var alchemyVision = watson.alchemy_vision({
-  api_key: process.env.ALCHEMY_KEY || '<alchemy-key>'
+  api_key: alchemyCredentials.apikey
 });
 
 
