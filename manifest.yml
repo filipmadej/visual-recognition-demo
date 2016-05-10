@@ -1,3 +1,4 @@
+---
 declared-services:
   visual-recognition-service:
     label: visual_recognition
@@ -6,10 +7,11 @@ declared-services:
     label: alchemy_api
     plan: free
 applications:
-- name: visual-recognition-demo
+- name: workshop-watson
   command: npm start
   path: .
   memory: 512M
   services:
-  - visual-recognition-service
-  - alchemy-service
+    - visual-recognition-service
+    - alchemy-service
+  host: workshop-watson
