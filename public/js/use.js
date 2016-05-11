@@ -50,7 +50,9 @@ function setupUse(params) {
     $invalidImageUrl = $(pclass + 'invalid-image-url').hide(),
     $invalidUrl = $(pclass + 'invalid-url').show(),
     $dropzone = $(pclass + 'dropzone'),
-    $fileupload = $(pid + 'fileupload');
+    $fileupload = $(pid + 'fileupload'),
+    $classifiers = $('#classifiers'),
+    $addButton = $('#add-button');
 
   /**
    * Resets the panel
@@ -91,9 +93,9 @@ function setupUse(params) {
     if (!scores || scores.length === 0) {
       var message = $('.test--classifier-name').length === 0 ?
         'The image could not be classified' :
-        'This image is not a match for ' + $('.test--classifier-name').text();
+        'This image is not a match for ' + $('#classifier-name').val();
       if ($('#test').hasClass('active'))
-        message = 'Not a positive match for ' + $('.test--classifier-name').text() +
+        message = 'Not a positive match for ' + $('#classifier-name').val() +
         ' with a confidence above 50%';
       $tbody.html(
         '<tr class="base--tr use--output-tr" >' +
@@ -160,8 +162,11 @@ function setupUse(params) {
     $imageDataInput.val(imageData);
 
     var url = '/api/classify';
-    if (useClassifierId === true && CLASSIFIER_ID)
-      url += '?classifier_id=' +  CLASSIFIER_ID;
+
+    if($("#classifier-name").val() !== ""){
+            url += '?classifier_id=' + $("#classifier-name").val();
+    }else if (useClassifierId === true && CLASSIFIER_ID)
+            url += '?classifier_id=' +  CLASSIFIER_ID;
 
     // Grab all form data
     $.post(url, $(pclass + 'form').serialize())
@@ -190,6 +195,23 @@ function setupUse(params) {
     var imgPath = $(this).next('label').find('img').attr('src');
     classifyImage(imgPath);
     $urlInput.val('');
+  });
+
+  $addButton.unbind("click");
+  $addButton.click(function(e){
+    e.preventDefault();
+    e.stopPropagation();
+
+    $('#classifiers :selected').text(function (index, val) {
+        var id = $(this).val();
+        $("#classifier-name").val(function (index, val) {
+          if(val === ""){
+              return id;
+          } else {
+              return val + "," + id;
+          }
+      }.bind(this))
+    });
   });
 
   /*

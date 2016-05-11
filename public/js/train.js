@@ -221,7 +221,7 @@
     showPreviews();
     setTrainButtonState();
     setInputErrorState();
-    $('.tab-panels--tab[href="/test"]').addClass('disabled');
+    //$('.tab-panels--tab[href="/test"]').addClass('disabled');
   });
 
   $positiveClearButton.click(function(e) {
@@ -294,7 +294,7 @@
   $trainUrlInput.on('propertychange change click keyup input paste', function() {
     setTrainButtonState();
     setInputErrorState();
-    $('.tab-panels--tab[href="/test"]').addClass('disabled');
+    //$('.tab-panels--tab[href="/test"]').addClass('disabled');
   });
 
   function populateTestThumbnails(positives, negatives, positiveSize, negativeSize) {
@@ -392,7 +392,7 @@
         }
         $('.train--dropzone label').removeClass('dragover');
         resetTestSamples();
-        $('.tab-panels--tab[href="/test"]').addClass('disabled');
+        //$('.tab-panels--tab[href="/test"]').addClass('disabled');
       },
       error: _error,
       done: function(e, data) {
@@ -448,7 +448,7 @@
   }
 
   // init pages
-  setupUse({ panel: 'use' });
+  setupUse({ panel: 'use', useClassifierId: true });
   setupUse({ panel: 'test', useClassifierId: true });
 
   /**
@@ -457,7 +457,7 @@
    */
   function setupTestPanel(classifier) {
     CLASSIFIER_ID = classifier.classifier_id;
-    $('.test--classifier-name').text(classifier.name);
+    $('#classifier-name').val(CLASSIFIER_ID);
     landscapify('.test--example-image-overlay');
     imageFadeIn('.test--example-image-overlay');
 
@@ -505,7 +505,7 @@
   var classifier = Cookies.get('classifier');
   // enable test if there is trained classifier
   if (classifier)
-    $('.tab-panels--tab[href="/test"]').removeClass('disabled');
+    //$('.tab-panels--tab[href="/test"]').removeClass('disabled');
 
   // send the user to train if they hit /test without a trained classifier
   if (currentPage() === '/test') {

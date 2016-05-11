@@ -1,6 +1,12 @@
 include ../mixins/sampleInput.jade
-
-h2.base--h2.test--classifier-name
+p.base Classifiers
+p.base Add classifiers or leave empty field to search all. 
+form.classifiers-form
+  input.base--h2.test--classifier-name#classifier-name
+  select(id="classifiers")
+      each val in classifiers
+        option.classifiers(value=val.classifier_id)=val.name
+  button#add-button Add
 hr.base--hr.test--hr
 .test--input-container.toggled
   h3.base--h3.test--header Test your classifier

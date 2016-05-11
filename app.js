@@ -16,17 +16,6 @@
 
 'use strict';
 
-try {
-  var env = require('./.env.js');
-  console.log('loading .env.js');
-  for (var key in env) {
-    if (!(key in process.env))
-      process.env[key] = env[key];
-  }
-} catch(ex) {
-  console.log('.env.js not found');
-}
-
 var express = require('express'),
   app = express(),
   fs = require('fs'),
@@ -39,14 +28,22 @@ var express = require('express'),
   zipUtils = require('./config/zip-utils'),
   uuid      = require('uuid'),
   watson = require('watson-developer-cloud'),
-  cfenv = require("cfenv");
+  cfenv = require("cfenv"),
+  fsSync = require('fs-sync');
 
 var appEnv = cfenv.getAppEnv();
+
+if(appEnv.isLocal){
+  var env = fsSync.readJSON('env.json');
+  appEnv = cfenv.getAppEnv(env);
+  console.log("Running local");
+}
+
 var alchemyCredentials = appEnv.getServiceCreds("alchemy-service");
 var visualCredentials = appEnv.getServiceCreds("visual-recognition-service");
 
-
 var ONE_HOUR = 3600000;
+var classifiers = null;
 
 // Bootstrap application settings
 require('./config/express')(app);
@@ -58,6 +55,22 @@ var visualRecognition = watson.visual_recognition({
   password: visualCredentials.password,
   version_date:'2015-12-02'
 });
+
+visualRecognition.listClassifiers({},
+  function(err, response) {
+   if (err)
+    console.log(err);
+   else
+    var data = response.classifiers;
+
+    classifiers = data.slice(0);
+    classifiers.sort(function(a,b) {
+        var x = a.name.toLowerCase();
+        var y = b.name.toLowerCase();
+        return x < y ? -1 : x > y ? 1 : 0;
+    });
+  }
+);
 
 var alchemyVision = watson.alchemy_vision({
   api_key: alchemyCredentials.apikey
@@ -81,8 +94,24 @@ app.get('/train', function(req, res) {
 });
 
 app.get('/test', function(req, res) {
+    visualRecognition.listClassifiers({},
+      function(err, response) {
+       if (err)
+        console.log(err);
+       else
+        var data = response.classifiers;
+
+        classifiers = data.slice(0);
+        classifiers.sort(function(a,b) {
+            var x = a.name.toLowerCase();
+            var y = b.name.toLowerCase();
+            return x < y ? -1 : x > y ? 1 : 0;
+        });
+      }
+    );
   res.render('test', {
     datasets: datasets,
+    classifiers: classifiers,
     ct: req._csrfToken,
     ga: process.env.GOOGLE_ANALYTICS
   });
@@ -211,9 +240,10 @@ app.post('/api/classify', app.upload.single('images_file'), function(req, res, n
     if (req.query.classifier_id) {
       var vparams = {
         images_file: file,
-        classifier_ids: [req.query.classifier_id]
+        classifier_ids: req.query.classifier_id.split(",")
       };
-
+      console.log(req.query.classifier_id);
+      console.log(vparams);
       visualRecognition.classify(vparams, function(err, results) {
         if (req.file || req.body.image_data) // delete the recognized file
           fs.unlink(file.path);
