@@ -38,6 +38,7 @@ Give it a try! Click the button below to fork into IBM DevOps Services and deplo
   Create env.json file locally.
   
   Example:
+  ```
   {
    "vcap": {
    "services": {
@@ -68,7 +69,7 @@ Give it a try! Click the button below to fork into IBM DevOps Services and deplo
    }
    }
 }
-
+```
 2. Install [Node.js](http://nodejs.org/)
 3. Go to the project folder in a terminal and run:
     `npm install`
