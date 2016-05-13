@@ -34,9 +34,14 @@ var express = require('express'),
 var appEnv = cfenv.getAppEnv();
 
 if(appEnv.isLocal){
-  var env = fsSync.readJSON('env.json');
-  appEnv = cfenv.getAppEnv(env);
-  console.log("Running local");
+  try{
+      var env = fsSync.readJSON('env.json');
+      appEnv = cfenv.getAppEnv(env);
+      console.log("Running local");
+    } catch (e){
+      console.log(e);
+    }
+
 }
 
 var alchemyCredentials = appEnv.getServiceCreds("alchemy-service");
@@ -51,8 +56,8 @@ require('./config/express')(app);
 // Create the service wrapper
 var visualRecognition = watson.visual_recognition({
   version: 'v2-beta',
-  username: visualCredentials.username,
-  password: visualCredentials.password,
+  username: visualCredentials ? visualCredentials.username : null,
+  password: visualCredentials ? visualCredentials.password : null,
   version_date:'2015-12-02'
 });
 
@@ -62,18 +67,21 @@ visualRecognition.listClassifiers({},
     console.log(err);
    else
     var data = response.classifiers;
-
-    classifiers = data.slice(0);
-    classifiers.sort(function(a,b) {
-        var x = a.name.toLowerCase();
-        var y = b.name.toLowerCase();
-        return x < y ? -1 : x > y ? 1 : 0;
-    });
+    if(data){
+        classifiers = data.slice(0);
+        classifiers.sort(function(a,b) {
+            var x = a.name.toLowerCase();
+            var y = b.name.toLowerCase();
+            return x < y ? -1 : x > y ? 1 : 0;
+        });
+      } else {
+        console.log(response);
+      }
   }
 );
 
 var alchemyVision = watson.alchemy_vision({
-  api_key: alchemyCredentials.apikey
+  api_key: alchemyCredentials ? alchemyCredentials.apikey : null
 });
 
 
