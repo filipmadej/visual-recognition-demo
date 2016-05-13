@@ -14,4 +14,3 @@ applications:
   services:
     - visual-recognition-service
     - alchemy-service
-  host: workshop-watson
