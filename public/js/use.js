@@ -163,7 +163,7 @@ function setupUse(params) {
 
     var url = '/api/classify';
 
-    if($("#classifier-name").val() !== ""){
+    if($("#classifier-name").val()){
             url += '?classifier_id=' + $("#classifier-name").val();
     }else if (useClassifierId === true && CLASSIFIER_ID)
             url += '?classifier_id=' +  CLASSIFIER_ID;
